@@ -36,13 +36,6 @@
 (defn display [result]
   [:div.display result])
 
-(defn operator-press [op display set-display history set-history]
-  (set-history (conj history display op))
-  (set-display 0))
-
-(defn digit-press [digit display set-display]
-  (set-display (long (str display digit))))
-
 (defn compute [result & [op num & xs]]
   (case op
     "+" (recur (+ result num) xs)
@@ -51,25 +44,24 @@
     "*" (recur (* result num) xs)
     result))
 
-(defn compute-press [display set-display history set-history]
+(defn compute-press [display  history]
   (let [history (conj history display)
         result (apply compute history)]
-    (set-display result)
-    (set-history [])))
-
-(defn clear-press [set-display set-history]
-  (set-display "0")
-  (set-history []))
+    result))
 
 (defn calculator []
   (let [[queue set-history] (react/useState [])
         [display-value set-display] (react/useState 0)
         button-press (fn [variant val]
                        (case variant
-                         "digit"  (digit-press val display-value set-display)
-                         "op" (operator-press val display-value set-display queue set-history)
-                         "compute" (compute-press display-value set-display queue set-history)
-                         "clear" (clear-press set-display set-history)))]
+                         "digit"  (set-display (long (str display-value val)))
+                         "op" (do (set-history (conj queue display-value val))
+                                  (set-display 0))
+                         "compute" (let [computed-value (compute-press display-value queue)]
+                                     (set-display computed-value)
+                                     (set-history []))
+                         "clear" (do (set-display "0")
+                                     (set-history []))))]
     [:div.calculator
      [:h2.calculatorTitle "Basic Calculator"]
      [:f> history queue]
