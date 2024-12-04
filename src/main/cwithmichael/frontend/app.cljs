@@ -2,6 +2,8 @@
   (:require
    ["react" :as react]
    [clojure.string :as str]
+   [goog.string :as gstring]
+   [goog.string.format]
    [reagent.dom :as rdom]))
 
 (defn history [history]
@@ -58,7 +60,7 @@
                          "op" (do (set-history (conj queue display-value val))
                                   (set-display 0))
                          "compute" (let [computed-value (compute-press display-value queue)]
-                                     (set-display computed-value)
+                                     (set-display (gstring/format "%.2f" computed-value))
                                      (set-history []))
                          "clear" (do (set-display "0")
                                      (set-history []))))]
