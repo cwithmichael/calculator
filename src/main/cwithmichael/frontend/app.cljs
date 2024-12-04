@@ -60,7 +60,9 @@
                          "op" (do (set-history (conj queue display-value val))
                                   (set-display 0))
                          "compute" (let [computed-value (compute-press display-value queue)]
-                                     (set-display (gstring/format "%.2f" computed-value))
+                                     (set-display (if (integer? computed-value)
+                                                    computed-value
+                                                    (gstring/format "%.2f" computed-value)))
                                      (set-history []))
                          "clear" (do (set-display "0")
                                      (set-history []))))]
